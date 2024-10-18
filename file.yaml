@@ -1,0 +1,149 @@
+openapi: 3.0.0
+info:
+  title: Orders API
+  description: API for managing orders and uploading them to AWS
+  version: 1.0.0
+servers:
+  - url: https://api.example.com/v1
+paths:
+  /orders:
+    get:
+      isFileUpload: false
+      summary: Retrieve a list of orders
+      responses:
+        '200':
+          description: A list of orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    customerName:
+                      type: string
+                    totalAmount:
+                      type: number
+                      format: float
+                    status:
+                      type: string
+
+    post:
+      isFileUpload: false
+      summary: Create a new order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                customerName:
+                  type: string
+                totalAmount:
+                  type: number
+                  format: float
+                status:
+                  type: string
+      responses:
+        '201':
+          description: Order created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+
+  /orders/{getbyid}:
+    get:
+      isFileUpload: false
+      summary: Retrieve an order by ID
+      parameters:
+        - name: getbyid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Order details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  customerName:
+                    type: string
+                  totalAmount:
+                    type: number
+                    format: float
+                  status:
+                    type: string
+        '404':
+          description: Order not found
+
+  /uploadorderstoaws:
+    post:
+      isFileUpload: true
+      summary: Upload orders to AWS
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                orders:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      customerName:
+                        type: string
+                      totalAmount:
+                        type: number
+                        format: float
+                      status:
+                        type: string
+      responses:
+        '200':
+          description: Orders uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Orders uploaded successfully."
+        '400':
+          description: Bad request, invalid file or data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "File upload failed."
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "An error occurred during file upload."
